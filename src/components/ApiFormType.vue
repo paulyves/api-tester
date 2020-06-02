@@ -126,6 +126,36 @@
 				<div class="col"><button type="button" class="btn btn-primary mb-2 float-right" @click="submit">Submit</button></div>
 			</div>
 		</div>
+		<div class="form-block type acc-status container" v-if="apiType == 'replace-wh1'">
+			<h6 v-if="showParameters">Parameters</h6>
+			<div class="row" v-if="showParameters">
+				<div class="col-3">
+					<div class="form-group">
+		                <label for="url">Username</label>
+	    				<input type="text" class="form-control" v-model="repWh1Params.username">
+                  	</div>
+                </div>
+                <div class="col-3">
+					<div class="form-group">
+		                <label for="ext-status">Force</label>
+                        <select class="form-control" id="ext-status" v-model="repWh1Params.force">
+                          <option value="true">True</option>
+                          <option value="false">False</option>
+                        </select>
+                  	</div>
+                </div>
+                
+				<div class="col-6">
+					<div class="form-group">
+		                <label for="url">Install ID</label>
+	    				<input type="text" class="form-control" v-model="repWh1Params.install_id">
+                  	</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col"><button type="button" class="btn btn-primary mb-2 float-right" @click="submit">Submit</button></div>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -154,12 +184,17 @@ export default {
   			country_code : "63",
   			include_group : true,
   			status : ""
+  		},
+  		repWh1Params : {
+  			username : "",
+  			install_id : "",
+  			force : false
   		}
   	}
   },
   watch: {
   	apiType: {
-  		handler: 'getUrlByType',
+  		handler: 'updateUrlParam',
   		immediate: true
   	},
   	statParams: {
@@ -171,7 +206,13 @@ export default {
   		handler: "updateUrlParam",
   		immediate: true,
   		deep: true
-  	}
+  	},
+  	repWh1Params: {
+  		handler: "updateUrlParam",
+  		immediate: true,
+  		deep: true
+  	},
+
   },
   methods : {
   	submit(){
@@ -184,6 +225,8 @@ export default {
   			params = this.statParams;
   		}else if(this.apiType == 'acc-lock-get' || this.apiType == 'acc-lock-set'){
   			params = this.lockParams;
+  		}else if(this.apiType == 'replace-wh1'){
+  			params = this.repWh1Params;
   		}
   		for(let i in params){
   			if(params[i].length != 0)
@@ -211,6 +254,9 @@ export default {
   				url = process.env.VUE_APP_API_URL + "get_extension_lock_status";
   				this.lockParams.status = "";
   				this.lockParams.clear_device_info = "";
+  				break;
+  			case "replace-wh1" :
+  				url = process.env.VUE_APP_API_URL + "set_install_id";
   				break;
   			default: 
   				url = process.env.VUE_APP_API_URL;

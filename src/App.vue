@@ -23,8 +23,8 @@
                           <option value="acc-status-set">Set Extension Status</option>
                           <option value="acc-lock-get">Get Lock Status</option>
                           <option value="acc-lock-set">Set Lock Status</option>
-                          <option value="trnsf-wavenum">Transfer Wave Number</option>
                           <option value="replace-wh1">Replace WH1 Unit</option>
+                          <option value="trnsf-wavenum">Transfer Wave Number</option>
                           <option value="set-dev-wavenum">Set Device Wave Number</option>
                         </select>
                       </div>
