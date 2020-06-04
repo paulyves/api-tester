@@ -29,11 +29,17 @@
                         </select>
                       </div>
                     </div>
+                    <div class="col-6">
+                      <div class="form-group">
+                        <label for="token">Token</label>
+                        <input type="text" class="form-control" id="token" v-model="token">
+                      </div>
+                    </div>
                   </div>
                 </div>
                <div class="row">
                     <div class="col">
-                      <ApiFormType :apiType="apiType" @submit="submit" />
+                      <ApiFormType :apiType="apiType" @submit="submit" :isLoading="isLoading" @clearResponse="clearResponse" />
                     </div>
                   </div>
               </div>
@@ -43,7 +49,11 @@
             <div class="col">
               <div class="card">
                 <div class="card-body">
-                  Result
+                  <h4>Response</h4>
+                  <div>Status Code {{statusCode}}</div>
+                  <div class="pre-container">
+                    <pre>{{jsonResponse}}</pre>
+                  </div>
                 </div>
               </div>
             </div>
@@ -66,17 +76,32 @@ export default {
   },
   data(){
     return {
-      apiType : "acc-status-get"
+      apiType : "acc-status-get",
+      jsonResponse: "",
+      statusCode : "",
+      isLoading : false,
+      token : ""
     }
   },
   methods: {
     submit(data){
-      console.log(data);
+      this.isLoading = true;
+      this.clearResponse();
+      axios.defaults.headers.common["Authorization"] = this.token;
       axios.get(data.url)
       .then(response=>{
         console.log(response);
+        this.statusCode = response.status;
+        this.jsonResponse = JSON.stringify(response.data, null , 2);
       })
-      .catch(err =>console.log(err))
+      .catch(err =>{
+        this.statusCode = err.response.status;
+        this.jsonResponse = JSON.stringify(err.response.data, null , 2);
+      }).finally(()=>this.isLoading = false)
+    },
+    clearResponse(){
+      this.jsonResponse = "";
+      this.statusCode = "";
     }
   }
 }

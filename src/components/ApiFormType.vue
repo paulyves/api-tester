@@ -11,7 +11,7 @@
 			</div>
 		</div>
 		<div class="form-block type acc-status container" v-if="apiType == 'acc-status-get' || apiType == 'acc-status-set'">
-			<h6 v-if="showParameters">Parameters</h6>
+			<h5 v-if="showParameters">Parameters</h5>
 			<div class="row" v-if="showParameters">
 				<div class="col-3">
 					<div class="form-group">
@@ -62,12 +62,9 @@
                   	</div>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col"><button type="button" class="btn btn-primary mb-2 float-right" @click="submit">Submit</button></div>
-			</div>
 		</div>
 		<div class="form-block type acc-lock container" v-if="apiType == 'acc-lock-get' || apiType == 'acc-lock-set'">
-			<h6 v-if="showParameters">Parameters</h6>
+			<h5 v-if="showParameters">Parameters</h5>
 			<div class="row" v-if="showParameters">
 				<div class="col-3">
 					<div class="form-group">
@@ -122,12 +119,9 @@
 				</div>
 				
 			</div>
-			<div class="row">
-				<div class="col"><button type="button" class="btn btn-primary mb-2 float-right" @click="submit">Submit</button></div>
-			</div>
 		</div>
 		<div class="form-block type acc-status container" v-if="apiType == 'replace-wh1'">
-			<h6 v-if="showParameters">Parameters</h6>
+			<h5 v-if="showParameters">Parameters</h5>
 			<div class="row" v-if="showParameters">
 				<div class="col-3">
 					<div class="form-group">
@@ -152,10 +146,35 @@
                   	</div>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col"><button type="button" class="btn btn-primary mb-2 float-right" @click="submit">Submit</button></div>
-			</div>
 		</div>
+    <div class="form-block type transfer-wn container" v-if="apiType == 'trnsf-wavenum'">
+      <h5 v-if="showParameters">Parameters</h5>
+      <div class="row" v-if="showParameters">
+        <div class="col-6">
+          <div class="form-group">
+              <label for="url">From MAC Address</label>
+              <input type="text" class="form-control" v-model="tfParams.from_mac">
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="form-group">
+              <label for="url">To MAC Address</label>
+              <input type="text" class="form-control" v-model="tfParams.to_mac">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <button type="button" class="btn btn-primary mb-2 float-right" @click="submit" v-if="!isLoading">Submit</button>
+          <b-button variant="primary" disabled class="float-right mb-2 " v-else>
+            <b-spinner small type="grow"></b-spinner>
+            Loading...
+          </b-button>
+        </div>
+      </div>
+    </div>
 	</div>
 </template>
 
@@ -164,7 +183,7 @@
 
 export default {
   name: 'ApiFormType',
-  props: ['apiType'],
+  props: ['apiType','isLoading'],
   data(){
   	return{
   		url : process.env.VUE_APP_API_URL,
@@ -189,7 +208,11 @@ export default {
   			username : "",
   			install_id : "",
   			force : false
-  		}
+  		},
+      tfParams : {
+        from_mac : "",
+        to_mac  : ""
+      }
   	}
   },
   watch: {
@@ -212,6 +235,11 @@ export default {
   		immediate: true,
   		deep: true
   	},
+    tfParams: {
+      handler: "updateUrlParam",
+      immediate: true,
+      deep: true
+    },
 
   },
   methods : {
@@ -227,12 +255,15 @@ export default {
   			params = this.lockParams;
   		}else if(this.apiType == 'replace-wh1'){
   			params = this.repWh1Params;
-  		}
+  		}else if(this.apiType == 'trnsf-wavenum'){
+        params = this.tfParams;
+      }
   		for(let i in params){
   			if(params[i].length != 0)
   				arrayParams.push(`${i}=${encodeURIComponent(params[i])}`);
   		}
   		this.url = this.getUrlByType(this.apiType) +  '?' + arrayParams.join("&");
+      this.$emit("clearResponse");
   	},
   	getUrlByType(data){
   		let url = "";
@@ -258,6 +289,9 @@ export default {
   			case "replace-wh1" :
   				url = process.env.VUE_APP_API_URL + "set_install_id";
   				break;
+        case "trnsf-wavenum" :
+          url = process.env.VUE_APP_API_URL + "transfer_wave_number";
+          break;
   			default: 
   				url = process.env.VUE_APP_API_URL;
   		}
